@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cynergy Application Management System</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden; /* Prevent scrolling */
+    }
+    #file-viewer {
+      width: 100vw; /* Full width */
+      height: 100vh; /* Full height */
+      border: none;
+    }
+    h1 {
+      text-align: center;
+      color: red;
+      font-size: 2em;
+      margin-top: 20%;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="file-viewer"></iframe>
+  <h1 id="error-message" style="display: none;"></h1> <!-- Error message container -->
+
+  <script>
+    // Get query parameter from URL
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    // Display the file using iframe
+    function displayFile(fileName) {
+      const iframe = document.getElementById("file-viewer");
+      const filePath = `applications/${fileName}.html`; // Search in the 'applications' folder
+
+      // Check if the file exists by creating a temporary XMLHttpRequest
+      const xhr = new XMLHttpRequest();
+      xhr.open('HEAD', filePath, true);
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          iframe.src = filePath; // If file exists, set iframe source
+        } else {
+          showError("Application not found"); // If file doesn't exist, show error
+        }
+      };
+      xhr.onerror = function() {
+        showError("Application not found"); // Show error on network failure
+      };
+      xhr.send();
+    }
+
+    // Display error message in <h1>
+    function showError(message) {
+      const errorMessageElement = document.getElementById("error-message");
+      errorMessageElement.textContent = message;
+      errorMessageElement.style.display = "block"; // Show error message
+    }
+
+    // Check for metadata in the URL
+    const metadata = getQueryParam("appID");
+    if (metadata) {
+      displayFile(metadata); // Display file if valid query parameter is found
+    } else {
+      showError("Application not found"); // Show error if no appID parameter is provided
+    }
+  </script>
+</body>
+</html>
